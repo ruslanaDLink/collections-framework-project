@@ -3,29 +3,29 @@ package org.user.impl;
 import org.user.list.MyList;
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
-public class MyArrayList implements MyList {
+public class MyArrayList<T> implements MyList<T>, Iterable<T>{
     private static final int DEFAULT_CAPACITY = 10;
-    private Object[] objects;
+    private T[] objects;
 
     private int modCount;
     private int size;
 
     public MyArrayList() {
-        this.objects = new Object[DEFAULT_CAPACITY];
+        this.objects = (T[]) new Object[DEFAULT_CAPACITY];
     }
 
-    public MyArrayList(Object[] objects) {
+    public MyArrayList(T[] objects) {
         this.objects = objects;
         this.size = objects.length;
     }
 
     public MyArrayList(int capacity) {
         if (capacity > 0) {
-            this.objects = new Object[capacity];
+            this.objects = (T[]) new Object[capacity];
         } else {
             throw new IllegalArgumentException("Illegal Capacity: " + capacity);
         }
@@ -41,14 +41,14 @@ public class MyArrayList implements MyList {
     }
 
     @Override
-    public boolean add(Object element) {
+    public boolean add(T element) {
         resizeList();
         objects[size++] = element;
         return true;
     }
 
     @Override
-    public void add(Object element, int index) {
+    public void add(T element, int index) {
         checkIndex(index);
         resizeList();
         System.arraycopy(objects, index, objects, index + 1, size);
@@ -58,40 +58,42 @@ public class MyArrayList implements MyList {
     }
 
     @Override
-    public Object remove(int index) {
+    public T remove(int index) {
         checkIndex(index);
-        Object objToRemove = objects[index];
+        T objToRemove = objects[index];
         for (int i = index; i < size - 1; i++) {
             objects[i] = objects[i + 1];
         }
         objects[size - 1] = null;
         size--;
+        modCount++;
         return objToRemove;
     }
 
     @Override
-    public boolean remove(Object element) {
+    public boolean remove(T element) {
         for (int i = 0; i < size; i++) {
             if (objects[i].equals(element)) {
                 int position = size - i - 1;
                 System.arraycopy(objects, i + 1, objects, i, position);
                 objects[--size] = null;
                 modCount++;
+                return true;
             }
         }
-        return !contains(element);
+        return false;
     }
 
     @Override
-    public Object get(int index) {
+    public T get(int index) {
         checkIndex(index);
         return objects[index];
     }
 
     @Override
-    public Object set(int index, Object element) {
+    public T set(int index, T element) {
         checkIndex(index);
-        Object object = objects[index];
+        T object = objects[index];
         objects[index] = element;
         modCount++;
         return object;
@@ -103,8 +105,8 @@ public class MyArrayList implements MyList {
     }
 
     @Override
-    public boolean contains(Object element) {
-        for (int i = 0; i < objects.length; i++) {
+    public boolean contains(T element) {
+        for (int i = 0; i < size; i++) {
             if (objects[i].equals(element)) {
                 return true;
             }
@@ -113,7 +115,7 @@ public class MyArrayList implements MyList {
     }
 
     @Override
-    public int indexOf(Object element) {
+    public int indexOf(T element) {
         for (int i = 0; i < objects.length; i++) {
             if (objects[i].equals(element)) {
                 return i;
@@ -123,7 +125,7 @@ public class MyArrayList implements MyList {
     }
 
     @Override
-    public int lastIndexOf(Object element) {
+    public int lastIndexOf(T element) {
         int index = -1;
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] != null && objects[i].equals(element)) {
@@ -133,35 +135,6 @@ public class MyArrayList implements MyList {
         return index;
     }
 
-    @Override
-    public void addFirst(Object element) {
-        add(element, 0);
-    }
-
-    @Override
-    public void addLast(Object element) {
-        add(element);
-    }
-
-    @Override
-    public Object getFirst() {
-        return objects[0];
-    }
-
-    @Override
-    public Object getLast() {
-        return objects[size - 1];
-    }
-
-    @Override
-    public Object removeFirst() {
-        return remove(0);
-    }
-
-    @Override
-    public Object removeLast() {
-        return remove(size - 1);
-    }
 
     @Override
     public int size() {
@@ -169,17 +142,17 @@ public class MyArrayList implements MyList {
     }
 
     @Override
-    public Iterator<Object> iterator() {
+    public Iterator<T> iterator() {
         return new MyIterator();
     }
 
     @Override
-    public ListIterator<Object> listIterator() {
+    public ListIterator<T> listIterator() {
         return listIterator(0);
     }
 
     @Override
-    public ListIterator<Object> listIterator(int index) {
+    public ListIterator<T> listIterator(int index) {
         checkIndex(index);
         return new MyListIterator(index);
     }
@@ -190,93 +163,81 @@ public class MyArrayList implements MyList {
         }
     }
 
-    private class MyIterator implements Iterator<Object> {
-        private int cursor;
-        int iteratorModCount = modCount;
+    private class MyIterator implements Iterator<T> {
+        private int index = 0;
 
         @Override
         public boolean hasNext() {
-            return size > cursor;
+            return size > index;
         }
 
         @Override
-        public Object next() {
-            if (modCount != iteratorModCount) {
-                throw new ConcurrentModificationException();
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
-            return objects[cursor++];
-        }
-    }
-
-    private class MyListIterator implements ListIterator<Object> {
-        private int cursor;
-        private int listModCount = modCount;
-        private int lastIndex;
-
-        MyListIterator(int cursor) {
-            this.cursor = cursor;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return size > cursor;
-        }
-
-        @Override
-        public Object next() {
-            if (modCount != listModCount) {
-                throw new ConcurrentModificationException();
-            }
-            return objects[cursor++];
-        }
-
-        @Override
-        public boolean hasPrevious() {
-            return cursor > 0;
-        }
-
-        @Override
-        public Object previous() {
-            if (modCount != listModCount) {
-                throw new ConcurrentModificationException();
-            }
-            checkIndex(cursor);
-            lastIndex = --cursor;
-            return objects[cursor];
-        }
-
-        @Override
-        public int nextIndex() {
-            return cursor;
-        }
-
-        @Override
-        public int previousIndex() {
-            return cursor - 1;
+            return objects[index++];
         }
 
         @Override
         public void remove() {
-            if (modCount != listModCount) {
-                throw new ConcurrentModificationException();
-            }
+            MyArrayList.this.remove(size - 1);
+        }
+    }
+
+    private class MyListIterator implements ListIterator<T> {
+        private int index;
+        private int lastIndex;
+
+        MyListIterator(int cursor) {
+            this.index = cursor;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return size > index;
+        }
+
+        @Override
+        public T next() {
+            return objects[index++];
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return index > 0;
+        }
+
+        @Override
+        public T previous() {
+            checkIndex(index);
+            lastIndex = --index;
+            return objects[index];
+        }
+
+        @Override
+        public int nextIndex() {
+            return index;
+        }
+
+        @Override
+        public int previousIndex() {
+            return index - 1;
+        }
+
+        @Override
+        public void remove() {
             MyArrayList.this.remove(lastIndex);
         }
 
         @Override
-        public void set(Object o) {
-            if (modCount != listModCount) {
-                throw new ConcurrentModificationException();
-            }
+        public void set(T o) {
             MyArrayList.this.set(lastIndex, o);
         }
 
         @Override
-        public void add(Object o) {
-            if (modCount != listModCount) {
-                throw new ConcurrentModificationException();
-            }
-            MyArrayList.this.add(o, cursor++);
+        public void add(T o) {
+            MyArrayList.this.add(o, index++);
         }
     }
 }
