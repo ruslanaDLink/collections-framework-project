@@ -3,45 +3,33 @@ package org.user.list;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-public interface MyList<E> {
+public interface MyList<T> extends Iterable<T>{
 
-    boolean add(E element);
+    boolean add(T element);
 
-    void add(E element, int index);
+    void add(T element, int index);
 
-    E remove(int index);
+    T remove(int index);
 
-    boolean remove(E element);
+    boolean remove(T element);
 
-    E get(int index);
+    T get(int index);
 
-    E set(int index, E element);
+    T set(int index, T element);
 
     boolean isEmpty();
 
-    boolean contains(E element);
+    boolean contains(T element);
 
-    int indexOf(E element);
+    int indexOf(T element);
 
-    int lastIndexOf(E element);
-
-    void addFirst(E element);
-
-    void addLast(E element);
-
-    E getFirst();
-
-    E getLast();
-
-    E removeFirst();
-
-    E removeLast();
+    int lastIndexOf(T element);
 
     int size();
 
-    Iterator<E> iterator();
+    Iterator<T> iterator();
 
-    ListIterator<E> listIterator();
+    ListIterator<T> listIterator();
 
-    ListIterator<E> listIterator(int index);
+    ListIterator<T> listIterator(int index);
 }
