@@ -3,9 +3,7 @@ package org.user.impl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
@@ -24,24 +22,20 @@ class MyArrayListTest {
         String value5 = "#5.VALUE";
 
         //when
-        boolean addedValue1 = myArrayList.add(value1);
-        boolean addedValue2 = myArrayList.add(value2);
-        boolean addedValue3 = myArrayList.add(value3);
-        boolean addedValue4 = myArrayList.add(value4);
-        boolean addedValue5 = myArrayList.add(value5);
+        myArrayList.add(value1);
+        myArrayList.add(value2);
+        myArrayList.add(value3);
+        myArrayList.add(value4);
+        myArrayList.add(value5);
 
         //then
         Assertions.assertAll(
-                () -> Assertions.assertTrue(addedValue1, "Failed to add value " + value1),
-                () -> Assertions.assertTrue(addedValue2, "Failed to add value " + value2),
-                () -> Assertions.assertTrue(addedValue3, "Failed to add value " + value3),
-                () -> Assertions.assertTrue(addedValue4, "Failed to add value " + value4),
-                () -> Assertions.assertTrue(addedValue5, "Failed to add value " + value5)
+                () -> Assertions.assertEquals(5, myArrayList.size()),
+                () -> Assertions.assertEquals(myArrayList.get(4), value5),
+                () -> Assertions.assertEquals(myArrayList.get(2), value3),
+                () -> Assertions.assertTrue(myArrayList.contains("#4.VALUE")),
+                () -> Assertions.assertTrue(myArrayList.contains("#2.VALUE"))
         );
-    }
-
-    @Test
-    void testAdd() {
     }
 
     @Test
@@ -53,35 +47,49 @@ class MyArrayListTest {
         String value2 = "#2.VALUE";
         String value3 = "#3.VALUE";
 
-        //when
         myArrayList.add(value1);
         myArrayList.add(value2);
         myArrayList.add(value3);
 
+        //when
         boolean removedElement = myArrayList.remove(value1);
 
         //then
         Assertions.assertTrue(removedElement, "Failed to remove element " + removedElement);
+        Assertions.assertEquals(2, myArrayList.size());
+        Assertions.assertTrue(myArrayList.contains("#2.VALUE"));
     }
 
     @Test
     void testRemove() {
         //given
-        MyArrayList<String> myArrayList = new MyArrayList<>(3);
+        MyArrayList<String> myArrayList = new MyArrayList<>(5);
 
         String value1 = "#1.VALUE";
         String value2 = "#2.VALUE";
         String value3 = "#3.VALUE";
+        String value4 = "#4.VALUE";
+        String value5 = "#5.VALUE";
 
-        //when
         myArrayList.add(value1);
         myArrayList.add(value2);
         myArrayList.add(value3);
+        myArrayList.add(value4);
+        myArrayList.add(value5);
 
-        String removedElement = myArrayList.remove(1);
+        //when
+        String removedFirstElement = myArrayList.remove(1);
+        String removedSecondElement = myArrayList.remove(2);
 
+        for (String s : myArrayList) {
+            System.out.println(s);
+        }
         //then
-        Assertions.assertFalse(myArrayList.contains(removedElement), "Failed to remove element " + removedElement);
+        Assertions.assertFalse(myArrayList.contains(removedFirstElement), "Failed to remove element " + removedFirstElement);
+        Assertions.assertFalse(myArrayList.contains(removedSecondElement), "Failed to remove element " + removedSecondElement);
+        Assertions.assertEquals(3, myArrayList.size());
+        Assertions.assertFalse(myArrayList.contains("#2.VALUE"));
+        Assertions.assertFalse(myArrayList.contains("#4.VALUE"));
     }
 
     @Test
@@ -93,15 +101,17 @@ class MyArrayListTest {
         String value2 = "#2.VALUE";
         String value3 = "#3.VALUE";
 
-        //when
         myArrayList.add(value1);
         myArrayList.add(value2);
         myArrayList.add(value3);
 
+        //when
         String retrievedObj = myArrayList.get(2);
 
         //then
         Assertions.assertNotNull(retrievedObj, "Null Object");
+        Assertions.assertEquals(3, myArrayList.size());
+        Assertions.assertTrue(myArrayList.contains("#3.VALUE"));
     }
 
     @Test
@@ -113,20 +123,17 @@ class MyArrayListTest {
         String value2 = "#2.VALUE";
         String value3 = "#3.VALUE";
 
-        //when
         myArrayList.add(value1);
         myArrayList.add(value2);
         myArrayList.add(value3);
 
-        String actualObject = myArrayList.get(0);
-        String modifiedObject = myArrayList.set(0, "MODIFIED VALUE");
+        //when
+        myArrayList.set(0, "MODIFIED VALUE");
 
-        boolean equalsCondition = actualObject.equals(modifiedObject);
-
-        System.out.println(actualObject);
-        System.out.println(modifiedObject);
         //then
-        Assertions.assertTrue(equalsCondition, "Failed modification.");
+        Assertions.assertEquals(myArrayList.get(0), "MODIFIED VALUE", "Failed modification.");
+        Assertions.assertEquals(3, myArrayList.size());
+        Assertions.assertTrue(myArrayList.contains("#3.VALUE"));
     }
 
     @Test
@@ -139,16 +146,18 @@ class MyArrayListTest {
         String value2 = "#2.VALUE";
         String value3 = "#3.VALUE";
 
-        //when
         myArrayList.add(value1);
         myArrayList.add(value2);
         myArrayList.add(value3);
 
+        //when
         boolean isEmptyFirstList = myArrayList.isEmpty();
         boolean isEmptySecondList = myEmptyArrayList.isEmpty();
 
         //then
         Assertions.assertAll(
+                () -> Assertions.assertEquals(3, myArrayList.size()),
+                () -> Assertions.assertTrue(myArrayList.contains("#1.VALUE")),
                 () -> Assertions.assertFalse(isEmptyFirstList),
                 () -> Assertions.assertTrue(isEmptySecondList)
         );
@@ -164,14 +173,15 @@ class MyArrayListTest {
         String value2 = "#2.VALUE";
         String value3 = "#3.VALUE";
 
-        //when
         myArrayList.add(value1);
         myArrayList.add(value2);
         myArrayList.add(value3);
 
+        //when
         boolean contains = myArrayList.contains(value2);
 
         //then
+        Assertions.assertEquals(3, myArrayList.size());
         Assertions.assertTrue(contains, "Failed contains() condition.");
     }
 
@@ -185,12 +195,12 @@ class MyArrayListTest {
         String summer = "SUMMER";
         String autumn = "AUTUMN";
 
-        //when
         seasons.add(winter);
         seasons.add(spring);
         seasons.add(summer);
         seasons.add(autumn);
 
+        //when
         int indexOfWinter = seasons.indexOf(winter);
         int indexOfSpring = seasons.indexOf(spring);
         int indexOfSummer = seasons.indexOf(summer);
@@ -215,12 +225,12 @@ class MyArrayListTest {
         String summer = "SUMMER";
         String autumn = "AUTUMN";
 
-        //when
         seasons.add(winter);
         seasons.add(spring);
         seasons.add(summer);
         seasons.add(autumn);
 
+        //when
         int lastIndexOfSummer = seasons.lastIndexOf(summer);
 
         //then
@@ -240,8 +250,26 @@ class MyArrayListTest {
         pizzas.add("Pepperoni");
 
         //then
+        Assertions.assertTrue(pizzas.contains("Sicilian"));
+        Assertions.assertEquals("Margherita", pizzas.get(1));
         Assertions.assertEquals(5, pizzas.size());
+    }
 
+
+    @Test
+    void capacity() {
+        //given
+        MyArrayList<String> objects = new MyArrayList<>(2);
+        objects.add("obj_1");
+        objects.add("obj_2");
+        objects.add("obj_3");
+        objects.add("obj_4");
+
+        //when
+        int size = objects.size();
+
+        //then
+        Assertions.assertEquals(4, size);
     }
 
     @Test
@@ -249,7 +277,6 @@ class MyArrayListTest {
         //given
         MyArrayList<String> capitals = new MyArrayList<>(195);
 
-        //when
         capitals.add("Kiev");
         capitals.add("Warsaw");
         capitals.add("Canberra");
@@ -259,12 +286,13 @@ class MyArrayListTest {
         capitals.add("Madrid");
         capitals.add("Paris");
 
+        //when
         Iterator<String> iterator = capitals.iterator();
 
         //then
         Assertions.assertAll(
                 () -> Assertions.assertTrue(iterator.hasNext()),
-                () -> Assertions.assertEquals("Kiev", iterator.next())
+                () -> Assertions.assertEquals("Warsaw", iterator.next())
         );
     }
 
@@ -273,7 +301,6 @@ class MyArrayListTest {
         //given
         MyArrayList<String> capitals = new MyArrayList<>(195);
 
-        //when
         capitals.add("Kiev");
         capitals.add("Warsaw");
         capitals.add("Canberra");
@@ -283,6 +310,7 @@ class MyArrayListTest {
         capitals.add("Madrid");
         capitals.add("Paris");
 
+        //when
         ListIterator<String> listIterator = capitals.listIterator();
 
         //then
@@ -321,7 +349,6 @@ class MyArrayListTest {
         //given
         MyArrayList<String> capitals = new MyArrayList<>(195);
 
-        //when
         capitals.add("Kiev");
         capitals.add("Warsaw");
         capitals.add("Canberra");
@@ -331,6 +358,7 @@ class MyArrayListTest {
         capitals.add("Madrid");
         capitals.add("Paris");
 
+        //when
         ListIterator<String> listIterator = capitals.listIterator(5);
 
         //then
@@ -350,21 +378,25 @@ class MyArrayListTest {
         //given
         MyArrayList<String> count = new MyArrayList<>(3);
 
-        //when
         count.add("one");
         count.add("two");
         count.add("three");
 
+        //when
         Iterator<String> iterator = count.iterator();
 
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             String next = iterator.next();
-            if (next.equalsIgnoreCase("two")){
+            if (next.equalsIgnoreCase("two")) {
                 iterator.remove();
             }
+
         }
 
         //then
-
+        Assertions.assertEquals(2, count.size());
+        Assertions.assertFalse(count.contains("two"));
+        Assertions.assertTrue(count.contains("one"));
+        Assertions.assertTrue(count.contains("three"));
     }
 }

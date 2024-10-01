@@ -3,11 +3,12 @@ package org.user.impl;
 import org.user.list.MyList;
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-public class MyArrayList<T> implements MyList<T>, Iterable<T>{
+public class MyArrayList<T> implements MyList<T>, Iterable<T> {
     private static final int DEFAULT_CAPACITY = 10;
     private T[] objects;
 
@@ -165,6 +166,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T>{
 
     private class MyIterator implements Iterator<T> {
         private int index = 0;
+        private int iteratorModCount = modCount;
 
         @Override
         public boolean hasNext() {
@@ -173,6 +175,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T>{
 
         @Override
         public T next() {
+            checkForModification();
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -181,7 +184,15 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T>{
 
         @Override
         public void remove() {
-            MyArrayList.this.remove(size - 1);
+            checkForModification();
+            MyArrayList.this.remove(--index);
+            iteratorModCount = modCount;
+        }
+
+        private void checkForModification() {
+            if (iteratorModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
         }
     }
 
@@ -228,6 +239,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T>{
         @Override
         public void remove() {
             MyArrayList.this.remove(lastIndex);
+            lastIndex--;
         }
 
         @Override
