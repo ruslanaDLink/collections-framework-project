@@ -10,18 +10,13 @@ import java.util.NoSuchElementException;
 public class MyLinkedList<T> implements MyList<T> {
     private Node<T> firstNode;
     private Node<T> lastNode;
-    private int MODIFICATION_COUNT = 0;
+    private int MODIFICATION_COUNT;
     private int size = 0;
-
-    public MyLinkedList(T item) {
-        Node<T> newNode = new Node<>(item);
-        firstNode = newNode;
-        lastNode = newNode;
-    }
 
     public MyLinkedList() {
         firstNode = null;
         lastNode = null;
+        MODIFICATION_COUNT = 0;
     }
 
     private void checkIndex(int index) {
@@ -30,12 +25,20 @@ public class MyLinkedList<T> implements MyList<T> {
         }
     }
 
+    private void checkValue(T element) {
+        if (element == null) {
+            throw new NullPointerException();
+        }
+    }
+
     @Override
     public boolean add(T element) {
+        checkValue(element);
         boolean isAdded;
         Node<T> newNode = new Node<>(element);
         if (firstNode == null) {
             firstNode = newNode;
+            lastNode = newNode;
         } else {
             lastNode.next = newNode;
             newNode.previous = lastNode;
@@ -43,19 +46,21 @@ public class MyLinkedList<T> implements MyList<T> {
         }
         isAdded = true;
         size++;
+        MODIFICATION_COUNT++;
         return isAdded;
     }
 
     @Override
     public void add(T element, int index) {
         checkIndex(index);
+        checkValue(element);
         Node<T> nodeToAdd = new Node<>(element);
         Node<T> first = firstNode;
         Node<T> nodeFromIndex = null;
 
         for (int i = 0; i < index; i++) {
-            nodeFromIndex = first;
             first = first.next;
+            nodeFromIndex = first;
         }
         if (index == 0) {
             if (firstNode == null) {    //add on the start
@@ -86,19 +91,21 @@ public class MyLinkedList<T> implements MyList<T> {
         checkIndex(index);
         Node<T> nodeToRemove;
 
-        if (index == 0) { //remove on the start
+        if (index == 0) {
             nodeToRemove = firstNode;
             firstNode = firstNode.next;
-        } else if (index == size - 1) { //remove on the end
+            firstNode.previous = null;
+        } else if (index == (size - 1)) {
             nodeToRemove = lastNode;
+            lastNode = lastNode.previous;
             lastNode.next = null;
         } else {
             Node<T> first = firstNode;
             for (int i = 0; i < index; i++) {
                 first = first.next;
             }
-            nodeToRemove = first.next;
-            first.next = first.next.next;
+            nodeToRemove = first;
+            first.previous.next = first.next;
         }
         size--;
         MODIFICATION_COUNT++;
@@ -107,6 +114,7 @@ public class MyLinkedList<T> implements MyList<T> {
 
     @Override
     public boolean remove(T element) {
+        checkValue(element);
         boolean isRemoved = false;
         Node<T> first = firstNode;
 
@@ -131,6 +139,7 @@ public class MyLinkedList<T> implements MyList<T> {
                 isRemoved = true;
             }
         }
+        MODIFICATION_COUNT++;
         return isRemoved;
     }
 
@@ -147,6 +156,7 @@ public class MyLinkedList<T> implements MyList<T> {
     @Override
     public T set(int index, T element) {
         checkIndex(index);
+        checkValue(element);
         Node<T> first = firstNode;
         for (int i = 0; i < index; i++) {
             first = first.next;
@@ -164,6 +174,7 @@ public class MyLinkedList<T> implements MyList<T> {
 
     @Override
     public boolean contains(T element) {
+        checkValue(element);
         boolean contains = false;
 
         Node<T> first = firstNode;
@@ -283,15 +294,33 @@ public class MyLinkedList<T> implements MyList<T> {
     }
 
     private class MyListIterator implements ListIterator<T> {
+        private Node<T> nodeFromIndex;
         private int index;
         private int lastIndex;
         private int iteratorModCount = MODIFICATION_COUNT;
 
         public MyListIterator() {
+            index = 0;
+            this.nodeFromIndex = firstNode;
         }
 
         public MyListIterator(int index) {
+            checkIndex(index);
             this.index = index;
+            if(index == 0){
+                nodeFromIndex = null;
+            }
+            else if (index <= (size / 2)) {
+                nodeFromIndex = firstNode;
+                for (int i = 1; i < index; i++) {
+                    nodeFromIndex = nodeFromIndex.next;
+                }
+            } else {
+                nodeFromIndex = lastNode.previous;
+                for (int i = size - 1; i > index; i--) {
+                    nodeFromIndex = nodeFromIndex.previous;
+                }
+            }
         }
 
         @Override
@@ -305,15 +334,19 @@ public class MyLinkedList<T> implements MyList<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            Node<T> first = firstNode;
-            first = first.next;
+            if (nodeFromIndex == null) {
+                nodeFromIndex = firstNode;
+            } else {
+                nodeFromIndex = nodeFromIndex.next;
+            }
+            lastIndex = index;
             index++;
-            return first.item;
+            return nodeFromIndex.item;
         }
 
         @Override
         public boolean hasPrevious() {
-            return firstNode.previous != null;
+            return nodeFromIndex.previous != null;
         }
 
         @Override
@@ -322,10 +355,12 @@ public class MyLinkedList<T> implements MyList<T> {
             if (!hasPrevious()) {
                 throw new NoSuchElementException();
             }
-            Node<T> first = firstNode;
-            first = first.previous;
+            nodeFromIndex = nodeFromIndex.previous;
             lastIndex = --index;
-            return first.item;
+            if(nodeFromIndex == null){
+                return firstNode.item;
+            }
+            return nodeFromIndex.item;
         }
 
         @Override
@@ -354,9 +389,10 @@ public class MyLinkedList<T> implements MyList<T> {
 
         @Override
         public void add(T t) {
-            MyLinkedList.this.add(t);
-            iteratorModCount++;
+            checkForConcurrencyModification();
+            MyLinkedList.this.add(t, index);
             index++;
+            iteratorModCount++;
         }
 
         private void checkForConcurrencyModification() {
