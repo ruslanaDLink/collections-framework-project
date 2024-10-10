@@ -37,10 +37,10 @@ class MyLinkedListTest {
         MyLinkedList<String> strings = new MyLinkedList<>();
 
         //when
-        boolean isAdded1 = strings.add("str1");
-        boolean isAdded2 = strings.add("str2");
-        boolean isAdded3 = strings.add("str3");
-        boolean isAdded4 = strings.add("str4");
+        strings.add("str1");
+        strings.add("str2");
+        strings.add("str3");
+        strings.add("str4");
 
         //then
         Assertions.assertEquals("str5", strings.get(1));
@@ -99,7 +99,6 @@ class MyLinkedListTest {
 
         //then
         Assertions.assertEquals(str1, s);
-
     }
 
     @Test
@@ -138,7 +137,6 @@ class MyLinkedListTest {
         //then
         Assertions.assertTrue(isEmptyList);
         Assertions.assertFalse(isEmptyListFullOfStrings);
-
     }
 
     @Test
@@ -150,10 +148,14 @@ class MyLinkedListTest {
         strings.add("str3");
 
         //when
-        boolean contains = strings.contains("str2");
+        boolean contains1 = strings.contains("str1");
+        boolean contains2 = strings.contains("str2");
+        boolean contains3 = strings.contains("str3");
 
         //then
-        Assertions.assertTrue(contains);
+        Assertions.assertTrue(contains1);
+        Assertions.assertTrue(contains2);
+        Assertions.assertTrue(contains3);
     }
 
     @Test
@@ -250,17 +252,14 @@ class MyLinkedListTest {
 
         //when
         ListIterator<String> listIterator = strings.listIterator(1);
-        while(listIterator.hasNext()){
-            System.out.println(listIterator.next());
-        }
 
         //then
-//        Assertions.assertTrue(listIterator.hasNext());
-//        Assertions.assertEquals("str2", listIterator.next());
-//        Assertions.assertEquals("str3", listIterator.next());
-//        Assertions.assertTrue(listIterator.hasPrevious());
-//        Assertions.assertEquals("str2", listIterator.previous());
-//        Assertions.assertEquals("str3", listIterator.next());
-        //Assertions.assertEquals("str4", listIterator.next());
+        Assertions.assertTrue(listIterator.hasNext());
+        Assertions.assertEquals("str2", listIterator.next());
+        Assertions.assertEquals("str3", listIterator.next());
+        Assertions.assertTrue(listIterator.hasPrevious());
+        Assertions.assertEquals("str2", listIterator.previous());
+        Assertions.assertEquals("str3", listIterator.next());
+        Assertions.assertEquals("str4", listIterator.next());
     }
 }

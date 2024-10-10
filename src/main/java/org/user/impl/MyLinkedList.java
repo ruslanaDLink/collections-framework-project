@@ -301,20 +301,24 @@ public class MyLinkedList<T> implements MyList<T> {
 
         public MyListIterator() {
             index = 0;
+            this.nodeFromIndex = firstNode;
         }
 
         public MyListIterator(int index) {
             checkIndex(index);
             this.index = index;
-            if (index > (size / 2)) {
-                nodeFromIndex = lastNode;
+            if(index == 0){
+                nodeFromIndex = null;
+            }
+            else if (index <= (size / 2)) {
+                nodeFromIndex = firstNode;
+                for (int i = 1; i < index; i++) {
+                    nodeFromIndex = nodeFromIndex.next;
+                }
+            } else {
+                nodeFromIndex = lastNode.previous;
                 for (int i = size - 1; i > index; i--) {
                     nodeFromIndex = nodeFromIndex.previous;
-                }
-            } else if (index < (size / 2)) {
-                nodeFromIndex = firstNode;
-                for (int i = 0; i < index; i++) {
-                    nodeFromIndex = nodeFromIndex.next;
                 }
             }
         }
@@ -330,8 +334,13 @@ public class MyLinkedList<T> implements MyList<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            nodeFromIndex = nodeFromIndex.next;
-            lastIndex = index++;
+            if (nodeFromIndex == null) {
+                nodeFromIndex = firstNode;
+            } else {
+                nodeFromIndex = nodeFromIndex.next;
+            }
+            lastIndex = index;
+            index++;
             return nodeFromIndex.item;
         }
 
@@ -348,6 +357,9 @@ public class MyLinkedList<T> implements MyList<T> {
             }
             nodeFromIndex = nodeFromIndex.previous;
             lastIndex = --index;
+            if(nodeFromIndex == null){
+                return firstNode.item;
+            }
             return nodeFromIndex.item;
         }
 
