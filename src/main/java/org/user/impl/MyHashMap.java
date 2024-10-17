@@ -5,26 +5,27 @@ import org.user.map.MyMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int DEFAULT_CAPACITY = 16;
-    private LinkedList<MyEntry<K, V>>[] map;
-    private Set<MyEntry<K, V>> entries = new HashSet<>();
+    private static final int DEFAULT_CAPACITY = 16;
+    private Node<K, V>[] buckets;
     private int size = 0;
 
     public MyHashMap() {
-        map = new LinkedList[DEFAULT_CAPACITY];
+        this.buckets = new Node[DEFAULT_CAPACITY];
     }
 
     public MyHashMap(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Illegal capacity " + initialCapacity);
         }
-        map = new LinkedList[initialCapacity];
+        this.buckets = new Node[initialCapacity];
+    }
+
+    private int hash(Object key) {
+        return key == null ? 0 : key.hashCode();
     }
 
     @Override
@@ -42,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         boolean isKeyPresent = false;
         Set<MyMap.MyEntry<K, V>> set = entrySet();
         for (MyMap.MyEntry<K, V> myEntry : set) {
-            if (myEntry.getKey() == key) {
+            if (myEntry.getKey().equals(key)) {
                 isKeyPresent = true;
             }
         }
@@ -54,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         boolean isValuePresent = false;
         Set<MyMap.MyEntry<K, V>> set = entrySet();
         for (MyMap.MyEntry<K, V> myEntry : set) {
-            if (myEntry.getValue() == value) {
+            if (myEntry.getValue().equals(value)) {
                 isValuePresent = true;
             }
         }
@@ -64,53 +65,80 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V get(Object key) {
         V value = null;
-        Set<MyMap.MyEntry<K, V>> entries = entrySet();
-        for (MyMap.MyEntry<K, V> entry : entries) {
-            if (entry.getKey() == key) {
-                value = entry.getValue();
+        int hashcode = hash(key);
+        int index = hashcode % (buckets.length - 1);
+        Node<K, V> bucket = buckets[index];
+        while (bucket != null) {
+            if (bucket.key.equals(key)) {
+                value = bucket.value;
             }
+            bucket = bucket.next;
         }
         return value;
     }
 
     @Override
     public V put(K key, V value) {
-        V v = null;
-        Set<MyMap.MyEntry<K, V>> entries = entrySet();
-        for (MyMap.MyEntry<K, V> entry : entries) {
-            if ((key == null && entry.getKey() == null) || (key != null && key.equals(entry.getKey()))) {
-                v = entry.getValue();
-                entry.setValue(value);
-                size++;
-            }
+        if (key == null) {
+            throw new NullPointerException();
         }
+        V v;
+        int hashcode = hash(key);
+        int index = hashcode % (buckets.length - 1);
+        Node<K, V> bucket = buckets[index];
+
+        if (bucket == null) {
+            Node<K, V> newNode = new Node<>(key, value, null);
+            buckets[index] = newNode;
+            v = newNode.value;
+        } else {
+            Node<K, V> kvNode = bucket;
+            while (bucket != null) {
+                if (bucket.key.equals(key)) {
+                    bucket.value = value;
+                }
+                kvNode = bucket;
+                bucket = bucket.next;
+            }
+            kvNode.next = new Node<>(key, value, null);
+            v = kvNode.value;
+        }
+        size++;
         return v;
     }
 
     @Override
     public V remove(Object key) {
-        V v = null;
-        Set<MyMap.MyEntry<K, V>> entries = entrySet();
-        Iterator<MyMap.MyEntry<K, V>> iterator = entries.iterator();
-        for (MyMap.MyEntry<K, V> entry : entries) {
-            if (entry.getKey() == key) {
-                if ((key == null && entry.getKey() == null) || (key != null && key.equals(entry.getKey()))) {
-                    v = entry.getValue();
-                    iterator.remove();
-                    size--;
+        if (key == null) {
+            throw new NullPointerException();
+        }
+        int index = hash(key);
+        Node<K, V> bucket = buckets[index];
+        Node<K, V> previousNode = bucket;
+        V v = bucket.value;
+
+        while (bucket != null) {
+            if (bucket.key != null && bucket.key.equals(key)) {
+                v = bucket.value;
+                if (previousNode == bucket) {
+                    buckets[index] = bucket.next;
+                } else {
+                    previousNode.next = bucket.next;
                 }
             }
+            previousNode = bucket;
+            bucket = bucket.next;
         }
+        size--;
         return v;
     }
 
-
     @Override
-    public void putAll(MyMap<? extends K, ? extends V> m) {
-        if (m == null) {
+    public void putAll(MyMap<? extends K, ? extends V> map) {
+        if (map == null) {
             throw new NullPointerException();
         }
-        Set<? extends MyMap.MyEntry<? extends K, ? extends V>> myEntries = m.entrySet();
+        Set<? extends MyMap.MyEntry<? extends K, ? extends V>> myEntries = map.entrySet();
         for (MyMap.MyEntry<? extends K, ? extends V> myEntry : myEntries) {
             this.put(myEntry.getKey(), myEntry.getValue());
         }
@@ -118,7 +146,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void clear() {
-        map = new LinkedList[]{};
+        this.buckets = new Node[]{};
     }
 
     @Override
@@ -144,22 +172,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public Set<MyMap.MyEntry<K, V>> entrySet() {
         Set<MyMap.MyEntry<K, V>> entries = new HashSet<>();
-        for (LinkedList<MyEntry<K, V>> myEntries : map) {
-            if (myEntries != null) {
-                entries.addAll(myEntries);
+        for (Node<K, V> bucket : buckets) {
+            if (bucket != null) {
+                entries.add(bucket);
             }
         }
         return entries;
     }
 
 
-    private static class MyEntry<K, V> implements MyMap.MyEntry<K, V> {
-        private K key;
+    private static class Node<K, V> implements MyMap.MyEntry<K, V> {
+        private final K key;
         private V value;
+        private Node<K, V> next;
 
-        public MyEntry(K key, V value) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
 
         @Override
@@ -181,7 +211,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            MyEntry<?, ?> that = (MyEntry<?, ?>) o;
+            Node<?, ?> that = (Node<?, ?>) o;
             return Objects.equals(key, that.key) && Objects.equals(value, that.value);
         }
 
