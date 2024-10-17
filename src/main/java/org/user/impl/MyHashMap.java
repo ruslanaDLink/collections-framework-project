@@ -92,6 +92,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V get(Object key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
         V value = null;
         int hashcode = hash(key);
         int index = hashcode % (buckets.length - 1);
