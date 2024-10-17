@@ -115,7 +115,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hash(key);
         Node<K, V> bucket = buckets[index];
         Node<K, V> previousNode = bucket;
-        V v = bucket.value;
+        V v = null;
 
         while (bucket != null) {
             if (bucket.key != null && bucket.key.equals(key)) {
