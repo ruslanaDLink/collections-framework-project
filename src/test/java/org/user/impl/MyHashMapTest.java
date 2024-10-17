@@ -11,10 +11,9 @@ import java.util.Set;
 class MyHashMapTest {
 
     @Test
-    void size() {
+    void sizeShouldBeGreater0() {
         //given
         MyHashMap<Integer, String> hashMap = new MyHashMap<>();
-        MyHashMap<Integer, String> emptyHashMap = new MyHashMap<>();
 
         hashMap.put(1, "first_map_value");
         hashMap.put(2, "second_map_value");
@@ -23,18 +22,30 @@ class MyHashMapTest {
 
         //when
         int size = hashMap.size();
-        int emptyMapSize = emptyHashMap.size();
 
         //then
         Assertions.assertEquals(4, size, "Mismatched size -> " + size);
-        Assertions.assertEquals(0, emptyMapSize);
+
     }
 
     @Test
-    void isEmpty() {
+    void emptyMap() {
+        //arrange
+        MyHashMap<Integer, String> emptyHashMap = new MyHashMap<>();
+
+        //act
+        int emptyMapSize = emptyHashMap.size();
+        boolean isEmpty = emptyHashMap.size() == 0;
+
+        //assert
+        Assertions.assertEquals(0, emptyMapSize);
+        Assertions.assertTrue(isEmpty);
+    }
+
+    @Test
+    void shouldNotBeEmpty() {
         //given
         MyHashMap<Integer, String> hashMap = new MyHashMap<>();
-        MyHashMap<Integer, String> emptyHashMap = new MyHashMap<>();
 
         hashMap.put(1, "first_map_value");
         hashMap.put(2, "second_map_value");
@@ -43,11 +54,21 @@ class MyHashMapTest {
 
         //when
         boolean isEmpty = hashMap.isEmpty();
-        boolean isEmpty2 = emptyHashMap.isEmpty();
 
         //then
-        Assertions.assertTrue(isEmpty2);
         Assertions.assertFalse(isEmpty);
+    }
+
+    @Test
+    void shouldBeEmpty() {
+        //arrange
+        MyHashMap<Integer, String> emptyHashMap = new MyHashMap<>();
+
+        //act
+        boolean isEmpty = emptyHashMap.isEmpty();
+
+        //assert
+        Assertions.assertTrue(isEmpty);
     }
 
     @Test
@@ -70,9 +91,24 @@ class MyHashMapTest {
                 () -> Assertions.assertTrue(hashMap.containsKey(1)),
                 () -> Assertions.assertTrue(hashMap.containsKey(2)),
                 () -> Assertions.assertTrue(hashMap.containsKey(3)),
-                () -> Assertions.assertTrue(hashMap.containsKey(4)),
-                () -> Assertions.assertFalse(hashMap.containsKey(5)
-                ));
+                () -> Assertions.assertTrue(hashMap.containsKey(4)));
+    }
+
+    @Test
+    void shouldNotContainKey() {
+        //arrange
+        MyHashMap<Integer, String> data = new MyHashMap<>(4);
+
+        data.put(1, "Nominal data");
+        data.put(2, "Ordinal");
+        data.put(3, "Discrete");
+        data.put(4, "Continuous");
+
+        //act
+        boolean containsKey = data.containsKey(5);
+
+        //assert
+        Assertions.assertFalse(containsKey);
     }
 
     @Test
@@ -95,9 +131,24 @@ class MyHashMapTest {
                 () -> Assertions.assertTrue(hashMap.containsValue("first_map_value")),
                 () -> Assertions.assertTrue(hashMap.containsValue("second_map_value")),
                 () -> Assertions.assertTrue(hashMap.containsValue("third_map_value")),
-                () -> Assertions.assertTrue(hashMap.containsValue("fourth_map_value")),
-                () -> Assertions.assertFalse(hashMap.containsValue("fifth_map_value")
-                ));
+                () -> Assertions.assertTrue(hashMap.containsValue("fourth_map_value")));
+    }
+
+    @Test
+    void shouldNotContainValue() {
+        //arrange
+        MyHashMap<Integer, String> data = new MyHashMap<>(4);
+
+        data.put(1, "Nominal data");
+        data.put(2, "Ordinal");
+        data.put(3, "Discrete");
+        data.put(4, "Continuous");
+
+        //act
+        boolean containsValue = data.containsValue("random");
+
+        //assert
+        Assertions.assertFalse(containsValue);
     }
 
     @Test
@@ -120,6 +171,36 @@ class MyHashMapTest {
     }
 
     @Test
+    void getNullKey() {
+        //given
+        MyHashMap<Integer, String> hashMap = new MyHashMap<>(10);
+
+        //when
+        hashMap.put(1, "first_map_value");
+
+        //then
+        Assertions.assertThrows(NullPointerException.class, () -> hashMap.get(null));
+    }
+
+    @Test
+    void getNullValue() {
+        //arrange
+        MyHashMap<Integer, String> hashMap = new MyHashMap<>();
+
+        hashMap.put(1, "first_map_value");
+        hashMap.put(2, "second_map_value");
+        hashMap.put(3, "third_map_value");
+        hashMap.put(4, "fourth_map_value");
+
+        //act
+        String nullValue = hashMap.get(8);
+
+        //assert
+        Assertions.assertNull(nullValue);
+        Assertions.assertThrows(NullPointerException.class, () -> hashMap.get(null));
+    }
+
+    @Test
     void put() {
         //given
         MyHashMap<Integer, String> hashMap = new MyHashMap<>(4);
@@ -128,21 +209,28 @@ class MyHashMapTest {
         hashMap.put(1, "first_map_value");
         hashMap.put(2, "second_map_value");
         hashMap.put(3, "third_map_value");
-        hashMap.put(3, "third_map_value");
-        hashMap.put(3, "third_map_value");
-        hashMap.put(3, "third_map_value");
-        hashMap.put(3, "third_map_value");
-
 
         //then
-      //  Assertions.assertEquals(4, hashMap.size(), "Mismatched size.");
         Assertions.assertNotNull(hashMap.get(1), "Failed insertion.");
+    }
+
+    @Test
+    void putNullKey() {
+        //given
+        MyHashMap<Integer, String> hashMap = new MyHashMap<>(4);
+
+        //when
+        hashMap.put(1, "first_map_value");
+
+        //then
+        Assertions.assertThrows(NullPointerException.class, () -> hashMap.put(null, "second_map_value"));
     }
 
     @Test
     void remove() {
         //given
-        MyHashMap<Integer, String> hashMap = new MyHashMap<>();
+        MyHashMap<Integer, String> hashMap = new MyHashMap<>(5);
+
         hashMap.put(1, "first_map_value");
         hashMap.put(2, "second_map_value");
         hashMap.put(3, "third_map_value");
@@ -153,6 +241,19 @@ class MyHashMapTest {
 
         //then
         Assertions.assertFalse(hashMap.containsValue(removedValue));
+        Assertions.assertEquals(3, hashMap.size());
+    }
+
+    @Test
+    void removeNullKey() {
+        //given
+        MyHashMap<Integer, String> hashMap = new MyHashMap<>(10);
+
+        //when
+        hashMap.put(1, "first_map_value");
+
+        //then
+        Assertions.assertThrows(NullPointerException.class, () -> hashMap.remove(null));
     }
 
     @Test
@@ -172,6 +273,7 @@ class MyHashMapTest {
         Assertions.assertFalse(hashMap.containsKey(1));
         Assertions.assertFalse(hashMap.containsKey(2));
         Assertions.assertFalse(hashMap.containsValue("fourth_map_value"));
+        Assertions.assertEquals(0, hashMap.size());
     }
 
     @Test
@@ -187,12 +289,12 @@ class MyHashMapTest {
         //when
         Set<Integer> integerSet = hashMap.keySet();
         boolean contains = integerSet.contains(3);
-        boolean areKeysAbsent = integerSet.isEmpty();
+        boolean areKeysAbsent = !integerSet.isEmpty();
         int size = integerSet.size();
 
         //then
         Assertions.assertTrue(contains);
-        Assertions.assertFalse(areKeysAbsent);
+        Assertions.assertTrue(areKeysAbsent);
         Assertions.assertEquals(4, size);
     }
 
@@ -221,7 +323,7 @@ class MyHashMapTest {
     @Test
     void entrySet() {
         //given
-        MyHashMap<Integer, String> hashMap = new MyHashMap<>();
+        MyHashMap<Integer, String> hashMap = new MyHashMap<>(10);
 
         hashMap.put(1, "first_map_value");
         hashMap.put(2, "second_map_value");
