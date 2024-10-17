@@ -10,11 +10,16 @@ import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private final int INITIAL_CAPACITY;
+    //decides when to increase capacity
+    private static final float LOAD_FACTOR = 0.75f; //75% of map size
+
     private Node<K, V>[] buckets;
     private int size = 0;
 
     public MyHashMap() {
         this.buckets = new Node[DEFAULT_CAPACITY];
+        this.INITIAL_CAPACITY = DEFAULT_CAPACITY;
     }
 
     public MyHashMap(int initialCapacity) {
@@ -22,10 +27,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             throw new IllegalArgumentException("Illegal capacity " + initialCapacity);
         }
         this.buckets = new Node[initialCapacity];
+        this.INITIAL_CAPACITY = initialCapacity;
     }
 
     private int hash(Object key) {
         return key == null ? 0 : key.hashCode();
+    }
+
+    private void rehash() {
+        float limit = LOAD_FACTOR * buckets.length;
+        int newCapacity = size * 2;
+        Node<K, V>[] oldTable = buckets;
+        Node<K, V>[] newTable = new Node[newCapacity];
+
+        if(size >= limit) {
+            for (int i = 0; i < size; i++) {
+                Node<K, V> node = oldTable[i];
+                while (node != null) {
+                    int index = hash(node.key) % INITIAL_CAPACITY;
+                    Node<K, V> next = node.next;
+
+                    node.next = newTable[index];
+                    newTable[index] = node;
+                    node = next;
+                }
+            }
+            buckets = newTable;
+        }
     }
 
     @Override
@@ -82,6 +110,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             throw new NullPointerException();
         }
+        rehash();
         V v;
         int hashcode = hash(key);
         int index = hashcode % (buckets.length - 1);
@@ -147,6 +176,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void clear() {
         this.buckets = new Node[]{};
+        size = 0;
     }
 
     @Override
