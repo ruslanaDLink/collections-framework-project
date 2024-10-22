@@ -33,10 +33,12 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T> {
         }
     }
 
-    public MyArrayList(MyArrayList<T> elements) {
-        objects = elements.objects;
-        this.size = elements.size;
-        this.modCount = elements.modCount;
+    public MyArrayList(MyList<T> elements) {
+        this.objects = (T[]) new Object[elements.size()];
+        this.size = 0;
+        for (int i = 0; i < elements.size(); i++) {
+            add(elements.get(i));
+        }
     }
 
     private void resizeList() {
