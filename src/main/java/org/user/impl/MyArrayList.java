@@ -17,6 +17,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T> {
 
     public MyArrayList() {
         this.objects = (T[]) new Object[DEFAULT_CAPACITY];
+        size = 0;
     }
 
     public MyArrayList(T[] objects) {
@@ -30,6 +31,12 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T> {
         } else {
             throw new IllegalArgumentException("Illegal Capacity: " + capacity);
         }
+    }
+
+    public MyArrayList(MyArrayList<T> elements) {
+        objects = elements.objects;
+        this.size = elements.size;
+        this.modCount = elements.modCount;
     }
 
     private void resizeList() {
@@ -162,6 +169,15 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T> {
         if (index >= size || index < 0) {
             throw new IndexOutOfBoundsException("Invalid index: " + index);
         }
+    }
+
+    @Override
+    public String toString() {
+        Object[] objs = new Object[size];
+        System.arraycopy(objects, 0, objs, 0, size);
+        return "MyArrayList{" +
+                "objects=" + Arrays.toString(objs) +
+                '}';
     }
 
     private class MyIterator implements Iterator<T> {

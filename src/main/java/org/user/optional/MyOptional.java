@@ -3,23 +3,23 @@ package org.user.optional;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
-public class Optional<T> {
+public class MyOptional<T> {
     private final T value;
 
-    private Optional(T value) {
+    private MyOptional(T value) {
         this.value = value;
     }
 
-    public static <T> Optional<T> offNullable(T value) {
+    public static <T> MyOptional<T> offNullable(T value) {
         if (value == null) {
             return empty();
         } else {
-            return new Optional<>(value);
+            return new MyOptional<>(value);
         }
     }
 
-    public static <T> Optional<T> empty() {
-        return new Optional<>(null);
+    public static <T> MyOptional<T> empty() {
+        return new MyOptional<>(null);
     }
 
     public boolean isPresent() {
@@ -37,11 +37,11 @@ public class Optional<T> {
         return value != null ? value : otherValue;
     }
 
-    public static <T> Optional<T> of(T value) {
+    public static <T> MyOptional<T> of(T value) {
         if (value == null) {
             throw new NullPointerException();
         }
-        return new Optional<>(value);
+        return new MyOptional<>(value);
     }
 
     public boolean isEmpty() {
