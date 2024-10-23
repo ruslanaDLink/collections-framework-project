@@ -4,7 +4,6 @@ import org.user.impl.MyArrayList;
 import org.user.list.MyList;
 import org.user.optional.MyOptional;
 
-import java.util.Comparator;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,6 +17,7 @@ public class Main {
 //        skip();
 //        sort();
 //        findFirst();
+//        compare();
 //        task11();
 //        task13();
 //        task14();
@@ -25,7 +25,6 @@ public class Main {
 //        task16();
 //        task17();
     }
-
 
     public static void filterElements() {
         MyArrayList<Integer> integers = new MyArrayList<>();
@@ -134,7 +133,7 @@ public class Main {
         names.add("Cecylia");
 
         new MyStream<>(names)
-                .sorted(Comparator.naturalOrder())
+                .sorted(String::compareTo)
                 .forEach(System.out::println);
     }
 
@@ -149,6 +148,18 @@ public class Main {
         System.out.println(optional.get());
     }
 
+    public static void compare() {
+        MyArrayList<Integer> numbers = new MyArrayList<>();
+        numbers.add(8);
+        numbers.add(13);
+        numbers.add(1);
+        numbers.add(27);
+
+        new MyStream<>(numbers)
+                .compare(Integer::compare)
+                .forEach(System.out::println);
+    }
+
     public static void task11() {
         MyArrayList<String> names = new MyArrayList<>();
         names.add("Daniel");
@@ -157,7 +168,7 @@ public class Main {
         names.add("Cecylia");
 
         new MyStream<>(names)
-                .sorted(Comparator.naturalOrder())
+                .sorted(String::compareTo)
                 .skip(2)
                 .forEach(System.out::println);
     }
@@ -209,7 +220,7 @@ public class Main {
         names.add("Ela");
 
         String result = new MyStream<>(names)
-                .sorted(Comparator.naturalOrder())
+                .sorted(String::compareTo)
                 .skip(3)
                 .findFirst()
                 .get();

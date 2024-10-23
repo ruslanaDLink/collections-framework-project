@@ -1,12 +1,11 @@
 package org.user.stream;
 
 import org.user.impl.MyArrayList;
-
-import java.util.Comparator;
+import org.user.stream.functionalinterfaces.MyComparator;
 
 public class MyBubbleSort<T> {
 
-    public MyArrayList<T> sort(MyArrayList<T> list, Comparator<T> comparator) {
+    public MyArrayList<T> sort(MyArrayList<T> list, MyComparator<T> comparator) {
         int length = list.size();
         for (int i = 0; i < length - 1; i++) {
             for (int j = 0; j < length - i - 1; j++) {
