@@ -1,17 +1,14 @@
 package org.user.stream;
 
 import org.user.impl.MyArrayList;
-import org.user.list.MyList;
 import org.user.optional.MyOptional;
+import org.user.stream.functionalinterfaces.MyComparator;
 import org.user.stream.functionalinterfaces.MyConsumer;
 import org.user.stream.functionalinterfaces.MyFunction;
 import org.user.stream.functionalinterfaces.MyPredicate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 
 public class MyStream<T> {
@@ -25,7 +22,6 @@ public class MyStream<T> {
         return new MyArrayList<>(elements);
     }
 
-    // Tutaj będą implementowane kolejne metody
 
     public MyStream<T> filter(MyPredicate<T> predicate) {
         MyArrayList<T> filteredElements = new MyArrayList<>();
@@ -90,13 +86,20 @@ public class MyStream<T> {
         return new MyStream<>(skippedElementsList);
     }
 
-    public MyStream<T> sorted(Comparator<T> comparator) {
+    public MyStream<T> sorted(MyComparator<T> comparator) {
         MyBubbleSort<T> bubbleSort = new MyBubbleSort<>();
         return new MyStream<>(bubbleSort.sort(elements, comparator));
     }
 
 
     public MyOptional<T> findFirst() {
-        return MyOptional.of(elements.get(0));
+        return MyOptional.offNullable(elements.get(0));
     }
+
+    public MyStream<T> compare(MyComparator<T> comparator) {
+        MyBubbleSort<T> bubbleSort = new MyBubbleSort<>();
+        MyArrayList<T> comparedElements = bubbleSort.sort(elements, comparator);
+        return new MyStream<>(comparedElements);
+    }
+
 }
