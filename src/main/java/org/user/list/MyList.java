@@ -1,15 +1,24 @@
 package org.user.list;
 
+import org.user.impl.MyArrayList;
 import org.user.stream.MyStream;
 
 import java.util.Iterator;
 import java.util.ListIterator;
 
-public interface MyList<T> extends Iterable<T>{
+public interface MyList<T> extends Iterable<T> {
 
     boolean add(T element);
 
     void add(T element, int index);
+
+    @SafeVarargs
+    static <T> MyList<T> of(T... elements) {
+        if (elements == null) {
+            throw new NullPointerException();
+        }
+        return new MyArrayList<>(elements);
+    }
 
     T remove(int index);
 
