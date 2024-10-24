@@ -64,6 +64,9 @@ public class MyStream<T> {
     }
 
     public MyStream<T> limit(int maxSize) {
+        if (maxSize < 0) {
+            throw new IllegalArgumentException("Forbidden negative size " + maxSize);
+        }
         MyArrayList<T> limitedElements = new MyArrayList<>();
 
         for (int i = 0; i < elements.size(); i++) {
@@ -75,6 +78,9 @@ public class MyStream<T> {
     }
 
     public MyStream<T> skip(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Forbidden negative number " + n);
+        }
         MyArrayList<T> skippedElementsList = new MyArrayList<>();
 
         if (n > 0 && n < elements.size()) {
