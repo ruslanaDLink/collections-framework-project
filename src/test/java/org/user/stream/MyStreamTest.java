@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.user.impl.MyArrayList;
 import org.user.list.MyList;
+import org.user.optional.MyOptional;
 
 import java.util.NoSuchElementException;
 
@@ -136,7 +137,7 @@ class MyStreamTest {
         //act
         MyStream<String> stream = integers.stream();
         //assert
-        Assertions.assertThrows(NullPointerException.class, () ->stream.sorted(String::compareTo).toList());
+        Assertions.assertThrows(NullPointerException.class, () -> stream.sorted(String::compareTo).toList());
     }
 
     @Test
@@ -145,10 +146,17 @@ class MyStreamTest {
         MyList<String> defaultStrings = MyList.of(
                 "1_STRING_1", "2_STRING_2", "3_STRING_3", "4_STRING_4", "5_STRING_5");
         //act
-        String firstVar = defaultStrings.stream().findFirst().get();
+        MyOptional<String> optional = defaultStrings.stream().findFirst();
+        boolean isPresent = optional.isPresent();
+        boolean isEmpty = optional.isEmpty();
+        String firstVar = optional.get();
         //assert
-        Assertions.assertNotNull(firstVar);
-        Assertions.assertEquals(defaultStrings.get(0), firstVar);
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(firstVar),
+                () -> Assertions.assertTrue(isPresent),
+                () -> Assertions.assertFalse(isEmpty),
+                () -> Assertions.assertEquals(defaultStrings.get(0), firstVar)
+        );
     }
 
     @Test
