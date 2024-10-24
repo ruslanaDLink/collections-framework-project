@@ -1,6 +1,7 @@
 package org.user.impl;
 
 import org.user.list.MyList;
+import org.user.stream.MyStream;
 
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
@@ -165,6 +166,11 @@ public class MyArrayList<T> implements MyList<T>, Iterable<T> {
     public ListIterator<T> listIterator(int index) {
         checkIndex(index);
         return new MyListIterator(index);
+    }
+
+    @Override
+    public MyStream<T> stream() {
+        return new MyStream<>(this);
     }
 
     private void checkIndex(int index) {

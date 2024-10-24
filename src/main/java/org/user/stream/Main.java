@@ -24,6 +24,17 @@ public class Main {
 //        task15();
 //        task16();
 //        task17();
+//        allMatch();
+//        anyMatch();
+//        task18();
+//        noneMatch();
+//        reduce();
+//        task19();
+//        min();
+//        max();
+//        task20();
+//        peek();
+        flatMap();
     }
 
     public static void filterElements() {
@@ -256,5 +267,185 @@ public class Main {
                 .map(String::toUpperCase)
                 .count();
         System.out.println(result);
+    }
+
+    public static void allMatch() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(10);
+        integers.add(30);
+        integers.add(40);
+        integers.add(60);
+        integers.add(80);
+
+        boolean b = new MyStream<>(integers)
+                .allMatch(n -> n > 0);
+        System.out.println(b);
+    }
+
+    public static void anyMatch() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(10);
+        integers.add(30);
+        integers.add(40);
+        integers.add(60);
+        integers.add(80);
+
+        boolean b = new MyStream<>(integers)
+                .anyMatch(n -> n > 50);
+        System.out.println(b);
+    }
+
+    public static void task18() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(2);
+        integers.add(4);
+        integers.add(6);
+        integers.add(9);
+        integers.add(12);
+
+        boolean isEven = integers
+                .stream()
+                .allMatch(n -> n % 2 == 0);
+
+        boolean isBigger10 = integers
+                .stream()
+                .anyMatch(n -> n > 10);
+
+        System.out.println("Czy parzysta? " + isEven);
+        System.out.println("Czy większa 10? " + isBigger10);
+    }
+
+    public static void noneMatch() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(10);
+        integers.add(30);
+        integers.add(40);
+        integers.add(60);
+        integers.add(80);
+
+        boolean b = new MyStream<>(integers)
+                .noneMatch(n -> n < 0);
+        System.out.println(b);
+    }
+
+    public static void reduce() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(10);
+        integers.add(30);
+        integers.add(40);
+
+        Integer sum = integers
+                .stream()
+                .reduce(10, Integer::sum);
+        System.out.println(sum);
+    }
+
+    public static void task19() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(12);
+        integers.add(15);
+        integers.add(8);
+        integers.add(22);
+
+        Integer sum = integers
+                .stream()
+                .filter(x -> x > 10)
+                .reduce(0, Integer::sum);
+        boolean smallerThan5 = integers
+                .stream()
+                .noneMatch(x -> x < 5);
+
+        System.out.println("Sum: " + sum);
+        System.out.println("smaller than 5: " + smallerThan5);
+    }
+
+    public static void min() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(12);
+        integers.add(15);
+        integers.add(8);
+        integers.add(22);
+
+        Integer minValue = integers
+                .stream()
+                .min(Integer::compareTo)
+                .get();
+
+        System.out.println(minValue);
+    }
+
+    public static void max() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(12);
+        integers.add(15);
+        integers.add(8);
+        integers.add(22);
+
+        Integer minValue = integers
+                .stream()
+                .max(Integer::compareTo)
+                .get();
+
+        System.out.println(minValue);
+    }
+
+    public static void task20() {
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(3);
+        integers.add(7);
+        integers.add(2);
+        integers.add(9);
+        integers.add(1);
+
+        Integer minValue = integers
+                .stream()
+                .min(Integer::compareTo)
+                .get();
+
+        Integer maxValue = integers
+                .stream()
+                .max(Integer::compareTo)
+                .get();
+
+        Integer sum = integers
+                .stream()
+                .reduce(0, Integer::sum);
+
+        System.out.println("Minimum value " + minValue);
+        System.out.println("Maximum value " + maxValue);
+        System.out.println("Sum " + sum);
+    }
+
+    public static void peek() {
+        MyArrayList<String> names = new MyArrayList<>();
+        names.add("Anna");
+        names.add("Agnieszka");
+        names.add("Bartek");
+        names.add("Cecylia");
+        names.add("Adam");
+
+        names
+                .stream()
+                .peek(System.out::println);
+    }
+
+    public static void flatMap() {
+        MyList<Integer> firstCollection = new MyArrayList<>();
+        firstCollection.add(1);
+        firstCollection.add(2);
+
+        MyList<Integer> secondCollection = new MyArrayList<>();
+        secondCollection.add(3);
+        secondCollection.add(4);
+
+        MyList<MyList<Integer>> numbers = new MyArrayList<>();
+        numbers.add(firstCollection);
+        numbers.add(secondCollection);
+
+        MyArrayList<Integer> list = numbers
+                .stream()
+                .flatMap(x -> new MyStream<>(x)).toList();
+
+        list.forEach(System.out::println);
     }
 }

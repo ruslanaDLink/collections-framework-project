@@ -12,8 +12,8 @@ class MyOptionalTest {
         //given
 
         //when
-        MyOptional<String> emptyMyOptional = MyOptional.offNullable(null);
-        MyOptional<String> nonEmptyMyOptional = MyOptional.offNullable("OPTIONAL_VALUE");
+        MyOptional<String> emptyMyOptional = MyOptional.ofNullable(null);
+        MyOptional<String> nonEmptyMyOptional = MyOptional.ofNullable("OPTIONAL_VALUE");
 
         //then
         Assertions.assertNotNull(emptyMyOptional);

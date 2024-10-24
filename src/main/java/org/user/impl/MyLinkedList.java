@@ -1,6 +1,7 @@
 package org.user.impl;
 
 import org.user.list.MyList;
+import org.user.stream.MyStream;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -245,6 +246,11 @@ public class MyLinkedList<T> implements MyList<T> {
         return new MyListIterator(index);
     }
 
+    @Override
+    public MyStream<T> stream() {
+        return new MyStream<>(this);
+    }
+
     private static class Node<T> {
         T item;
         Node<T> previous;
@@ -307,10 +313,9 @@ public class MyLinkedList<T> implements MyList<T> {
         public MyListIterator(int index) {
             checkIndex(index);
             this.index = index;
-            if(index == 0){
+            if (index == 0) {
                 nodeFromIndex = null;
-            }
-            else if (index <= (size / 2)) {
+            } else if (index <= (size / 2)) {
                 nodeFromIndex = firstNode;
                 for (int i = 1; i < index; i++) {
                     nodeFromIndex = nodeFromIndex.next;
@@ -357,7 +362,7 @@ public class MyLinkedList<T> implements MyList<T> {
             }
             nodeFromIndex = nodeFromIndex.previous;
             lastIndex = --index;
-            if(nodeFromIndex == null){
+            if (nodeFromIndex == null) {
                 return firstNode.item;
             }
             return nodeFromIndex.item;

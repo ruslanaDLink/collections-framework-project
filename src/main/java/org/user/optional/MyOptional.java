@@ -10,7 +10,7 @@ public class MyOptional<T> {
         this.value = value;
     }
 
-    public static <T> MyOptional<T> offNullable(T value) {
+    public static <T> MyOptional<T> ofNullable(T value) {
         if (value == null) {
             return empty();
         } else {

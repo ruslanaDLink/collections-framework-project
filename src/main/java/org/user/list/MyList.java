@@ -1,5 +1,7 @@
 package org.user.list;
 
+import org.user.stream.MyStream;
+
 import java.util.Iterator;
 import java.util.ListIterator;
 
@@ -32,4 +34,6 @@ public interface MyList<T> extends Iterable<T>{
     ListIterator<T> listIterator();
 
     ListIterator<T> listIterator(int index);
+
+    MyStream<T> stream();
 }
