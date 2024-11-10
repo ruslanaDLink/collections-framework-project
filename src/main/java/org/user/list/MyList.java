@@ -3,10 +3,12 @@ package org.user.list;
 import org.user.impl.MyArrayList;
 import org.user.stream.MyStream;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.concurrent.Callable;
 
-public interface MyList<T> extends Iterable<T> {
+public interface MyList<T> extends Iterable<T>{
 
     boolean add(T element);
 

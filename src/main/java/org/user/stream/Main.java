@@ -34,7 +34,12 @@ public class Main {
 //        max();
 //        task20();
 //        peek();
-        flatMap();
+//        flatMap();
+//        filterTestEfficiency();
+//        mapTestEfficiency();
+//        forEachTestEfficiency();
+//        distinctTestEfficiency();
+//        peekTestEfficiency();
     }
 
     public static void filterElements() {
@@ -57,7 +62,9 @@ public class Main {
         values.add("grey");
         MyStream<String> stringMyStream = new MyStream<>(values);
 
-        MyList<String> list = stringMyStream.map(String::toUpperCase).toList();
+        MyList<String> list = stringMyStream
+                .map(String::toUpperCase)
+                .toList();
         System.out.println(list);
     }
 
@@ -442,10 +449,141 @@ public class Main {
         numbers.add(firstCollection);
         numbers.add(secondCollection);
 
-        MyArrayList<Integer> list = numbers
+        numbers
                 .stream()
-                .flatMap(x -> new MyStream<>(x)).toList();
+                .flatMap(x -> new MyStream<>(x))
+                .forEach(System.out::println);
+    }
 
-        list.forEach(System.out::println);
+    public static void filterTestEfficiency() {
+        long duration;
+        long start = System.currentTimeMillis();
+        filterElements();
+        long end = System.currentTimeMillis();
+        duration = (end - start);
+        System.out.println("\nNon-parallel filter() method duration: " + duration + "\n");
+
+        long startParallel = System.currentTimeMillis();
+
+        MyArrayList<Integer> integers = new MyArrayList<>();
+        integers.add(10);
+        integers.add(20);
+        integers.add(30);
+        integers.add(40);
+        integers.add(50);
+        MyStream<Integer> integerMyStream = new MyStream<>(integers);
+        MyList<Integer> parallelList = integerMyStream.parallelStream().filter(num -> num > 30).toList();
+        System.out.println(parallelList.toString());
+
+        long endParallel = System.currentTimeMillis();
+        duration = (endParallel - startParallel);
+        System.out.println("\nParallel filter() method duration: " + duration);
+    }
+
+    public static void mapTestEfficiency() {
+        long duration;
+        long start = System.currentTimeMillis();
+        mapElements();
+        long end = System.currentTimeMillis();
+        duration = (end - start);
+        System.out.println("Non-parallel map() method duration: " + duration + "\n");
+
+
+        long parallelStart = System.currentTimeMillis();
+        MyArrayList<String> values = new MyArrayList<>();
+        values.add("red");
+        values.add("yellow");
+        values.add("black");
+        values.add("grey");
+        MyStream<String> stringMyStream = new MyStream<>(values);
+
+        MyList<String> list = stringMyStream
+                .parallelStream()
+                .map(String::toUpperCase)
+                .toList();
+        System.out.println(list);
+        long parallelEnd = System.currentTimeMillis();
+        duration = (parallelEnd - parallelStart);
+        System.out.println("Parallel map() method duration: " + duration);
+    }
+
+    public static void forEachTestEfficiency() {
+        long duration;
+        long start = System.currentTimeMillis();
+        forEachElement();
+        long end = System.currentTimeMillis();
+        duration = (end - start);
+        System.out.println("Non-parallel forEach() method duration: " + duration + "\n");
+
+
+        long parallelStart = System.currentTimeMillis();
+        MyArrayList<String> values = new MyArrayList<>();
+        values.add("red");
+        values.add("yellow");
+        values.add("black");
+        values.add("grey");
+        MyStream<String> stringMyStream = new MyStream<>(values);
+
+        stringMyStream
+                .parallelStream()
+                .forEach(System.out::println);
+
+        long parallelEnd = System.currentTimeMillis();
+        duration = (parallelEnd - parallelStart);
+        System.out.println("Parallel forEach() method duration: " + duration);
+    }
+
+    public static void distinctTestEfficiency() {
+        long duration;
+        long start = System.currentTimeMillis();
+        distinctElements();
+        long end = System.currentTimeMillis();
+        duration = (end - start);
+        System.out.println("Non-parallel distinct() method duration: " + duration + "\n");
+
+
+        long parallelStart = System.currentTimeMillis();
+        MyArrayList<String> names = new MyArrayList<>();
+        names.add("Anna");
+        names.add("Bartek");
+        names.add("Bartek");
+        names.add("Bartek");
+        names.add("Cecylia");
+        names.add("Dan");
+        names.add("Dan");
+        names.add("Dan");
+        names.add("Milosz");
+        MyStream<String> stream = new MyStream<>(names);
+        stream.parallelStream().distinct().forEach(System.out::println);
+        long parallelEnd = System.currentTimeMillis();
+        duration = (parallelEnd - parallelStart);
+        System.out.println("Parallel distinct() method duration: " + duration);
+    }
+
+    public static void peekTestEfficiency() {
+        long duration;
+        long start = System.currentTimeMillis();
+        peek();
+        long end = System.currentTimeMillis();
+        duration = (end - start);
+        System.out.println("Non-parallel peek() method duration: " + duration + "\n");
+
+
+        long parallelStart = System.currentTimeMillis();
+        MyArrayList<String> names = new MyArrayList<>();
+        names.add("Anna");
+        names.add("Agnieszka");
+        names.add("Bartek");
+        names.add("Cecylia");
+        names.add("Adam");
+
+        names
+                .stream()
+                .parallelStream()
+                .peek(System.out::println);
+
+        long parallelEnd = System.currentTimeMillis();
+        duration = (parallelEnd - parallelStart);
+        System.out.println("Parallel peek() method duration: " + duration);
     }
 }
